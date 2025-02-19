@@ -17,9 +17,36 @@ class CarType(DjangoObjectType):
 class HomeQuery(ObjectType):
     persons = graphene.List(PersonType)
     cars = graphene.List(CarType)
+    person = graphene.Field(PersonType, id=graphene.Int(), name=graphene.String())
+    car = graphene.Field(CarType, id=graphene.Int(), name=graphene.String())
+
 
     def resolve_persons(parent, info, **kwargs):
         return Person.objects.all()
+    
 
     def resolve_cars(parent, info, **kwargs):
         return Car.objects.all()
+
+
+    def resolve_person(parent, info, **kwargs):
+        id = kwargs.get('id')
+        name = kwargs.get('name')
+        if id and name is not None:
+            return Person.objects.get(id=id, name=name)
+        if id is not None:
+            return Person.objects.get(id=id)
+        if name is not None:
+            return Person.objects.get(name=name)
+        return None
+
+    def resolve_car(parent, info, **kwargs):
+        id = kwargs.get('id')
+        name = kwargs.get('name')
+        if id and name is not None:
+            return Car.objects.get(id=id, name=name)
+        if id is not None:
+            return Car.objects.get(id=id)
+        if name is not None:
+            return Car.objects.get(name=name)
+        return None
