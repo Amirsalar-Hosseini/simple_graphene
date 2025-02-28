@@ -1,6 +1,7 @@
 import graphene
 from graphene_django.types import DjangoObjectType, ObjectType
 from django.contrib.auth.models import User
+import graphql_jwt
 
 
 class UserType(DjangoObjectType):
@@ -15,6 +16,9 @@ class AccountsQuery(ObjectType):
 
 
     def resolve_user(parent, info, **kwargs):
+        user = info.context.user
+        if not user.is_authenticated:
+            raise Exception("you are gay")
         id = kwargs.get('id')
         if id is not None:
             return User.objects.get(id=id)
@@ -46,3 +50,6 @@ class CreateUser(graphene.Mutation):
 
 class Mutate(graphene.ObjectType):
     create_user = CreateUser.Field()
+    token_auth = graphql_jwt.ObtainJSONWebToken.Field()
+    verify_token = graphql_jwt.Verify.Field()
+    refresh_token = graphql_jwt.Refresh.Field()
